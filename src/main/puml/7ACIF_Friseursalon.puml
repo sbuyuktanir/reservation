@@ -1,0 +1,111 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+entity Reservierung {
+- reservierungName : String
+- creationTS : LocalDateTime
+- reservierungTS : ReservierungDateTime
+- kunde : Kunde
+}
+
+entity Services {
+- serviceName : String
+- servicePreis : Currency
+}
+
+class GebuchtService  << (V, #FF7700) value-object >> {
+- serviceDuration : Duration
+- serviceAmount : Integer
+}
+
+entity Products {
+- productName : String
+- productPreis : Currency
+}
+
+class GebuchtProduct  << (V, #FF7700) value-object >> {
+- productAmount : Integer
+}
+
+abstract AbstractPerson {
+- userName : String
+- password : String
+- firstName : String
+- lastName : String
+}
+
+entity Kunde {
+- billingAddress : Address
+- mobilePhoneNumber : PhoneNumber
+- email : Email
+}
+
+entity Admin {
+- mobilePhoneNumber : PhoneNumber
+- businessPhoneNumber : PhoneNumber
+- email : Email
+}
+
+entity Friseur {
+- nickName : String
+}
+
+enum Geschlecht {
+MAENLICH
+WEIBLICH
+DIVERS
+}
+
+entity Country {
+name : String
+iso2Code : String
+}
+
+enum EmailType {
+PRIVATE
+BUSINESS
+}
+
+class Address << (V, #FF7700) value-object >> {
+- streetNumber : String
+- zipCode : String
+- city : String
+- country : Country
+}
+
+class PhoneNumber << (V, #FF7700) value-object >> {
+- countryCode : Integer
+- areaCode : Integer
+- serialNumber : String
+}
+
+class Email << (V, #FF7700) value-object >> {
+- address : String
+- type : EmailType
+}
+
+'Reservierung "0..n" o..o "0..1" ReservierungList
+Admin --|> Friseur
+Kunde -up-|> AbstractPerson
+Friseur -up-|> AbstractPerson
+Kunde "0..1" -right- "0..n" Reservierung : done by >
+Admin "0..1" -- "0..n" Reservierung : taken by <
+Reservierung "0..n" -down- "0..n" Products
+Reservierung "0..n" -down- "0..n" Services
+Reservierung "0..1" -- "0..n" GebuchtProduct
+Reservierung "0..1" -up- "0..n" GebuchtService
+Products  -left-  GebuchtProduct
+Services  -right-  GebuchtService
+Friseur "0..n" -- "0..n" GebuchtService
+Admin "1" -right- "0..n" Friseur : manages >
+Kunde -- "0..1" Address : billingAddress
+Kunde -right- PhoneNumber : mobilePhoneNumber
+Kunde -- "0..1" Email : has >
+Kunde -left- Geschlecht
+Admin -right- PhoneNumber : mobilePhoneNumber
+Admin -up- "0..1" PhoneNumber : businessPhoneNumber
+Admin -- "0..1" Email : has >
+Email -- EmailType
+Address "0..n" -- Country
+
+@enduml
