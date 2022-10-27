@@ -20,6 +20,5 @@ public class GenderConverter extends AbstractEnumToStringConverter<Gender> {
             //    default -> null;
             default -> throw new IllegalArgumentException("Data Quality Problem in DB: %s is not a vlaid orientation value!".formatted(v));
         });
-
     }
 }
