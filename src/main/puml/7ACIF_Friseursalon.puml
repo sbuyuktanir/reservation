@@ -1,30 +1,38 @@
 @startuml
 'https://plantuml.com/class-diagram
 
-entity Reservierung {
-- reservierungName : String
+entity Reservation {
+- reservationName : String
 - creationTS : LocalDateTime
-- reservierungTS : ReservierungDateTime
-- kunde : Kunde
+- customer : Customer
+- product : Product
+- service : Service
+- bookedProduct : BookedProduct
+- bookedService : BookedService
 }
 
-entity Services {
+entity Service {
 - serviceName : String
 - servicePreis : Currency
-}
-
-class GebuchtService  << (V, #FF7700) value-object >> {
 - serviceDuration : Duration
-- serviceAmount : Integer
+- bookedService : BookedService
 }
 
-entity Products {
+class BookedService  << (V, #FF7700) value-object >> {
+- serviceTS : DateTime
+- serviceAmount : Integer
+- serviceBarber : Barber
+}
+
+entity Product {
 - productName : String
 - productPreis : Currency
+- bookedProduct : BookedProduct
 }
 
-class GebuchtProduct  << (V, #FF7700) value-object >> {
+class BookedProduct  << (V, #FF7700) value-object >> {
 - productAmount : Integer
+- productTS : DateTime
 }
 
 abstract AbstractPerson {
@@ -34,10 +42,11 @@ abstract AbstractPerson {
 - lastName : String
 }
 
-entity Kunde {
+entity Customer {
 - billingAddress : Address
 - mobilePhoneNumber : PhoneNumber
 - email : Email
+- gender : Gender
 }
 
 entity Admin {
@@ -46,13 +55,13 @@ entity Admin {
 - email : Email
 }
 
-entity Friseur {
+entity Barber {
 - nickName : String
 }
 
-enum Geschlecht {
-MAENLICH
-WEIBLICH
+enum Gender {
+MALE
+FEMALE
 DIVERS
 }
 
@@ -85,23 +94,23 @@ class Email << (V, #FF7700) value-object >> {
 }
 
 'Reservierung "0..n" o..o "0..1" ReservierungList
-Admin --|> Friseur
-Kunde -up-|> AbstractPerson
-Friseur -up-|> AbstractPerson
-Kunde "0..1" -right- "0..n" Reservierung : done by >
-Admin "0..1" -- "0..n" Reservierung : taken by <
-Reservierung "0..n" -down- "0..n" Products
-Reservierung "0..n" -down- "0..n" Services
-Reservierung "0..1" -- "0..n" GebuchtProduct
-Reservierung "0..1" -up- "0..n" GebuchtService
-Products  -left-  GebuchtProduct
-Services  -right-  GebuchtService
-Friseur "0..n" -- "0..n" GebuchtService
-Admin "1" -right- "0..n" Friseur : manages >
-Kunde -- "0..1" Address : billingAddress
-Kunde -right- PhoneNumber : mobilePhoneNumber
-Kunde -- "0..1" Email : has >
-Kunde -left- Geschlecht
+Admin -right-|> Barber : manages >
+Customer -up-|> AbstractPerson
+Barber -up-|> AbstractPerson
+Customer "0..1" -right- "0..n" Reservation : done by <
+Admin "0..1" -- "0..n" Reservation : handled by <
+Reservation "0..n" -down- "0..n" Product
+Reservation "0..n" -down- "0..n" Service
+Reservation "0..1" -- "0..n" BookedProduct
+Reservation "0..1" -up- "0..n" BookedService
+Product  -left-  BookedProduct
+Service  -right-  BookedService
+Barber "0..n" -- "0..n" BookedService
+' Admin "1" -right- "0..n" Barber : manages >
+Customer -- "0..1" Address : billingAddress
+Customer -right- PhoneNumber : mobilePhoneNumber
+Customer -- "0..1" Email : has >
+Customer -left- Gender
 Admin -right- PhoneNumber : mobilePhoneNumber
 Admin -up- "0..1" PhoneNumber : businessPhoneNumber
 Admin -- "0..1" Email : has >
